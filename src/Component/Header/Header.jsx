@@ -5,6 +5,7 @@ const Header = () => {
     const links = <>
         <li><NavLink to={"/"} className={({ isActive }) => isActive ? 'text-[#be0abe] border-[1px] border-[#23BE0A] text-lg' : 'btn-ghost'}>Home</NavLink></li>
         <li><NavLink to={"/login"} className={({ isActive }) => isActive ? 'text-[#be0abe] border-[1px] border-[#23BE0A] text-lg' : 'btn-ghost'}>Login</NavLink></li>
+        <li><NavLink to={"/glogin"} className={({ isActive }) => isActive ? 'text-[#be0abe] border-[1px] border-[#23BE0A] text-lg' : 'btn-ghost'}>Google Login</NavLink></li>
         <li><NavLink to={"/register"} className={({ isActive }) => isActive ? 'text-[#be0abe] border-[1px] border-[#23BE0A] text-lg' : 'btn-ghost'}>Register</NavLink></li>
     </>
 

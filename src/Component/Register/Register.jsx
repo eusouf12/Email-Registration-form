@@ -1,36 +1,59 @@
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from "firebase/auth";
 import auth from "../../Firebase/Firebase.config";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 
 const Register = () => {
     const [registerError, setRegisterError] = useState('');
-    const [success,setsuccess]=useState('')
+    const [success, setsuccess] = useState('')
 
     const handleRegistration = e => {
         //auto refresh break;
         e.preventDefault();
         const email = e.target.email.value;
+        const name = e.target.name.value;
         const password = e.target.password.value;
+        const terms = e.target.terms.checked;
         console.log(email, password);
 
         // reset error 
         setRegisterError('');
         setsuccess('');
 
-        if(password.length < 6)
-        {
+        if (password.length < 6) {
             setRegisterError('Password should be at least 6 characters or longer');
             return;
         }
+        else if (!/[A-Z]/.test(password)) {
+            setRegisterError('Your password should have at least one upper case letter');
+            return;
+        }
+        else if (!terms) {
+            setRegisterError('Please accept our terns and condition');
+            return;
+        }
 
-        
 
         // creat user 
         createUserWithEmailAndPassword(auth, email, password)
             .then(result => {
-
+               console.log(result.user)
                 setsuccess('User Created Successfully');
+                // update profile 
+
+                updateProfile(result.user,{
+                    displayName : name,
+                    photoURL: "https://example.com/jane-q-user/profile.jpg"
+                })
+                .then(()=> console.log('profile update'))
+                .catch()
+
+                // send verification mail 
+                sendEmailVerification(result.user)
+                    .then(() => {
+                        alert('Please check your email by varify your account')
+                    })
             })
             .catch(error => {
                 console.error(error);
@@ -43,19 +66,32 @@ const Register = () => {
             <h2 className="text-5xl text-white font-bold text-center pt-10">Please Register </h2>
 
             <form
-                onSubmit={handleRegistration} className='space-y-5'>
-                <input className='bg-base-300 py-3 rounded-2xl w-3/4 pl-5' type="email" name="email" id="" required />
+                onSubmit={handleRegistration} className='space-y-5 text-center'>
+
+                <input className='bg-base-300 py-3 rounded-2xl w-3/4 pl-5' type="email" name="email" id="" required placeholder="Email" />
+
                 <br />
-                <input className='bg-base-300 py-3 rounded-2xl w-3/4 pl-5' type="password" name="password" id="" required/>
+                <input className='bg-base-300 py-3 rounded-2xl w-3/4 pl-5' type="text" name="name" id="" required placeholder="Your name" />
+
+                <br />
+                <input className='bg-base-300 py-3 rounded-2xl w-3/4 pl-5' type="password" name="password" id="" required placeholder="Password" />
+                <br />
+                <div className="flex justify-start gap-2  items-center w-3/4 mx-auto">
+                    <input type="checkbox" name="terms" id="terms" />
+                    <label htmlFor="terms">Please accept our terms and condition</label>
+                </div>
                 <br />
                 <input className='py-3 rounded-2xl w-3/4 btn btn-secondary' type="submit" value="Register" />
+                <br />
+
             </form>
             {
                 registerError && <p className="text-rose-950">{registerError}</p>
             }
             {
-                success && <p className="text-green-600">{success}</p>
+                success && <p className="text-white">{success}</p>
             }
+            <h2 className="btn">Already Have an Account ? Please <Link to={"/login"}>Login</Link></h2>
         </div>
     );
 };
